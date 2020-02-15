@@ -73,9 +73,29 @@ class User implements UserInterface
     private $uuid;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Sucka", mappedBy="user")
+     * @ORM\Column(type="string", length=255)
      */
-    private $suckas;
+    private $rfid;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\UserPoints", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $point;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $username;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $profileImage;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Imageuploads", mappedBy="user")
+     */
+    private $imageuploads;
 
     /**
      * User constructor.
@@ -83,7 +103,7 @@ class User implements UserInterface
     public function __construct()
     {
         $this->uuid = Uuid::uuid4();
-        $this->suckas = new ArrayCollection();
+        $this->imageuploads = new ArrayCollection();
     }
 
     /**
@@ -297,42 +317,6 @@ class User implements UserInterface
     }
 
     /**
-     * @return Collection|Sucka[]
-     */
-    public function getSuckas(): Collection
-    {
-        return $this->suckas;
-    }
-
-    /**
-     * @param Sucka $sucka
-     * @return User
-     */
-    public function addSucka(Sucka $sucka): self
-    {
-        if (!$this->suckas->contains($sucka)) {
-            $this->suckas[] = $sucka;
-            $sucka->addUser($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Sucka $sucka
-     * @return User
-     */
-    public function removeSucka(Sucka $sucka): self
-    {
-        if ($this->suckas->contains($sucka)) {
-            $this->suckas->removeElement($sucka);
-            $sucka->removeUser($this);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getName(): string
@@ -346,5 +330,81 @@ class User implements UserInterface
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getRfid(): ?string
+    {
+        return $this->rfid;
+    }
+
+    public function setRfid(string $rfid): self
+    {
+        $this->rfid = $rfid;
+
+        return $this;
+    }
+
+    public function getPoint(): ?UserPoints
+    {
+        return $this->point;
+    }
+
+    public function setPoint(UserPoints $point): self
+    {
+        $this->point = $point;
+
+        // set the owning side of the relation if necessary
+        if ($point->getUser() !== $this) {
+            $point->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function setUsername(?string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage(string $profileImage): self
+    {
+        $this->profileImage = $profileImage;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Imageuploads[]
+     */
+    public function getImageuploads(): Collection
+    {
+        return $this->imageuploads;
+    }
+
+    public function addImageupload(Imageuploads $imageupload): self
+    {
+        if (!$this->imageuploads->contains($imageupload)) {
+            $this->imageuploads[] = $imageupload;
+            $imageupload->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImageupload(Imageuploads $imageupload): self
+    {
+        if ($this->imageuploads->contains($imageupload)) {
+            $this->imageuploads->removeElement($imageupload);
+            $imageupload->removeUser($this);
+        }
+
+        return $this;
     }
 }

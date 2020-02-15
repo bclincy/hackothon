@@ -111,11 +111,6 @@ class Location
     private $display;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Sucka", mappedBy="location")
-     */
-    private $suckas;
-
-    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Address", inversedBy="locations")
      */
     private $Address;
@@ -126,7 +121,6 @@ class Location
     public function __construct()
     {
         $this->locationId = Uuid::uuid4();
-        $this->suckas = new ArrayCollection();
         $this->Address = new ArrayCollection();
     }
 
@@ -458,34 +452,6 @@ class Location
     public function setDisplay(?string $display): self
     {
         $this->display = $display;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Sucka[]
-     */
-    public function getSuckas(): Collection
-    {
-        return $this->suckas;
-    }
-
-    public function addSucka(Sucka $sucka): self
-    {
-        if (!$this->suckas->contains($sucka)) {
-            $this->suckas[] = $sucka;
-            $sucka->addLocation($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSucka(Sucka $sucka): self
-    {
-        if ($this->suckas->contains($sucka)) {
-            $this->suckas->removeElement($sucka);
-            $sucka->removeLocation($this);
-        }
 
         return $this;
     }
